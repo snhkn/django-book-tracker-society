@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="columns">
+    <!-- Left column: User profile and buttons -->
+    <div class="column is-one-third">
+        <div class="block">
+            <a href="{% url 'core:profile_list' %}">
+                <button class="button is-dark is-outlined is-fullwidth">
+                    All Profiles
+                </button>
+            </a>
+        </div>
+
+        <div class="block">
+            <h3 class="title is-4">
+                {{ profile.user.username }} follows:
+            </h3>
+            <div class="content">
+                <ul>
+                    {% for following in profile.follows.all %}
+                        <li><a href="{% url 'core:profile' following.id %}">{{ following }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="block">
+            <h3 class="title is-4">
+                {{ profile.user.username }} is followed by:
+            </h3>
+            <div class="content">
+                <ul>
+                    {% for follower in profile.followed_by.all %}
+                        <li><a href="{% url 'core:profile' follower.id %}">{{ follower }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column: User book list -->
+    <div class="column">
+        <div class="block">
+            <h1 class="title is-1">{{ profile.user.username|upper }}'s Books</h1>
+        </div>
+
+        <div class="block">
+            <h2 class="title is-3">My Book List</h2>
+            <ul>
+                {% for item in user_books %}
+                    <li>{{ item.book.title }} by {{ item.book.author }} — {{ item.get_status_display }}</li>
+                {% empty %}
+                    <li>You haven’t added any books yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

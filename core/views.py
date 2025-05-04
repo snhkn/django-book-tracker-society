@@ -1,7 +1,21 @@
 from django.shortcuts import render, redirect
 from .forms import UserBookForm
-from .models import Book, UserBook
+from .models import Book, UserBook, Profile
 
+
+def dashboard(request):
+    return render(request, "base.html")
+
+
+def profile_list(request):
+    profiles = Profile.objects.exclude(user=request.user)
+    return render(request, "core/profile_list.html", {"profiles": profiles})
+
+
+def profile(request, pk):
+    profile = Profile.objects.get(pk=pk)
+    user_books = UserBook.objects.filter(user=profile)
+    return render(request, "core/profile.html", {"profile": profile, "user_books": user_books})
 
 def add_userbook(request):
     profile = request.user.profile
@@ -34,6 +48,7 @@ def add_userbook(request):
 def my_books(request):
     profile = request.user.profile
     user_books = UserBook.objects.filter(user=profile)
-
-    return render(request, 'core/my_books.html', {'user_books': user_books})
-
+    return render(request, 'core/my_books.html', {
+        'profile': profile,
+        'user_books': user_books
+    })
