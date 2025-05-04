@@ -11,3 +11,8 @@ class UserBookForm(forms.Form):
 
     def clean_author(self):
         return self.cleaned_data['author'].strip().title()
+
+class EditUserBookForm(forms.ModelForm):
+    class Meta:
+        model = UserBook
+        fields = ['status']

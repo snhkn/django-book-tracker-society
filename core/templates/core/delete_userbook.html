@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1 class="title">Delete Book</h1>
+  <p>Are you sure you want to delete <strong>{{ userbook.book.title }}</strong> from your list?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="button is-danger" type="submit">Yes, delete it</button>
+    <a href="{% url 'core:profile' request.user.profile.pk %}" class="button is-light">Cancel</a>
+  </form>
+</div>
+{% endblock %}

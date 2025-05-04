@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from .forms import UserBookForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import UserBookForm, EditUserBookForm
 from .models import Book, UserBook, Profile
 
 
@@ -52,3 +52,27 @@ def my_books(request):
         'profile': profile,
         'user_books': user_books
     })
+
+def edit_userbook(request, pk):
+    userbook = UserBook.objects.get(pk=pk)
+
+    if request.method == 'POST':
+        form = EditUserBookForm(request.POST, instance=userbook)
+        if form.is_valid():
+            form.save()
+            return redirect('core:profile', pk=request.user.profile.id)
+    else:
+        form = EditUserBookForm(instance=userbook)
+
+    return render(request, 'core/edit_userbook.html', {'form': form})
+
+
+
+def delete_userbook(request, pk):
+    userbook = get_object_or_404(UserBook, pk=pk, user=request.user.profile)
+
+    if request.method == 'POST':
+        userbook.delete()
+        return redirect('core:profile', pk=request.user.profile.pk)
+
+    return render(request, 'core/delete_userbook.html', {'userbook': userbook})

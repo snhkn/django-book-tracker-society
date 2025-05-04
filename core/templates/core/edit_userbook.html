@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1 class="title">Edit Book Entry</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button is-primary" type="submit">Save</button>
+    <a href="{% url 'core:profile' request.user.profile.pk %}" class="button is-light">Cancel</a>
+  </form>
+</div>
+{% endblock %}
