@@ -1,0 +1,9 @@
+<h2>My Book List</h2>
+
+<ul>
+  {% for item in user_books %}
+    <li>{{ item.book.title }} by {{ item.book.author }} — {{ item.status }}</li>
+  {% empty %}
+    <li>You haven’t added any books yet.</li>
+  {% endfor %}
+</ul>
