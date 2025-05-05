@@ -1,5 +1,3 @@
-<!-- dwitter/templates/base.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,11 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <title>Book Tracker Society</title>
+
+    <style>
+        .dashboard-link {
+            color: white;
+            text-decoration: none;
+        }
+
+        .dashboard-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+
     <section class="hero is-small is-success mb-4">
         <div class="hero-body">
-            <h1 class="title is-1">Book Tracker Society</h1>
+            <h1 class="title is-1">
+                <a href="{% url 'core:dashboard' %}" class="dashboard-link">
+                    Book Tracker Society
+                </a>
+            </h1>
             <p class="subtitle is-4">
                 Your book tracker and tiny social network
             </p>
@@ -22,7 +36,6 @@
     <div class="container">
         <div class="columns">
             {% block content %}
-
             {% endblock content %}
         </div>
     </div>

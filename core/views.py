@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import UserBookForm, EditUserBookForm
+from .forms import UserBookForm, EditUserBookForm, NoteForm
 from .models import Book, UserBook, Profile
 
 
 def dashboard(request):
-    return render(request, "core/dashboard.html")
+    form = NoteForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.user = request.user
+            note.save()
+            return redirect("core:dashboard")
+    return render(request, "core/dashboard.html", {"form": form})
 
 
 def profile_list(request):

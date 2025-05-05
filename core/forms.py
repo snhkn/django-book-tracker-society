@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserBook
+from .models import UserBook, Note
 
 class UserBookForm(forms.Form):
     title = forms.CharField(max_length=255)
@@ -16,3 +16,19 @@ class EditUserBookForm(forms.ModelForm):
     class Meta:
         model = UserBook
         fields = ['status']
+
+
+class NoteForm(forms.ModelForm):
+    content = forms.CharField(required=True,
+                              widget=forms.widgets.Textarea(
+                                  attrs={
+                                      "placeholder": "Note something...",
+                                      "class": "textarea is-success is-medium",
+                                  }
+                              ),
+                              label="",
+                              )
+
+    class Meta:
+        model = Note
+        exclude = ("user", )
