@@ -14,8 +14,16 @@ def profile_list(request):
 
 def profile(request, pk):
     profile = Profile.objects.get(pk=pk)
-    user_books = UserBook.objects.filter(user=profile)
-    return render(request, "core/profile.html", {"profile": profile, "user_books": user_books})
+    num_books = UserBook.objects.filter(user=profile).count()
+    num_to_read = UserBook.objects.filter(user=profile, status="to_read").count()
+    num_reading = UserBook.objects.filter(user=profile, status="reading").count()
+    num_finished = UserBook.objects.filter(user=profile, status="finished").count()
+    return render(request, "core/profile.html", {"profile": profile,
+                                                 "num_books": num_books,
+                                                 "num_to_read": num_to_read,
+                                                 "num_reading": num_reading,
+                                                 "num_finished": num_finished,
+                                                 })
 
 def add_userbook(request):
     profile = request.user.profile
@@ -36,7 +44,7 @@ def add_userbook(request):
             # Prevent duplicate UserBook
             if not UserBook.objects.filter(user=profile, book=book).exists():
                 UserBook.objects.create(user=profile, book=book, status=status)
-                return redirect('my_books')  # redirect after success
+                return redirect('core:my_books')  # redirect after success
             else:
                 form.add_error(None, "You already added this book.")
     else:
@@ -76,3 +84,14 @@ def delete_userbook(request, pk):
         return redirect('core:profile', pk=request.user.profile.pk)
 
     return render(request, 'core/delete_userbook.html', {'userbook': userbook})
+
+
+def filtered_books(request, status):
+    profile = request.user.profile
+    user_books = UserBook.objects.filter(user=profile, status=status)
+
+    return render(request, "core/filtered_books.html", {
+        "status": status,
+        "user_books": user_books,
+        "profile": profile,
+    })

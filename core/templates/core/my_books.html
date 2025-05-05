@@ -1,9 +1,30 @@
-<h2>My Book List</h2>
+{% extends 'base.html' %}
 
-<ul>
-  {% for item in user_books %}
-    <li>{{ item.book.title }} by {{ item.book.author }} — {{ item.status }}</li>
-  {% empty %}
-    <li>You haven’t added any books yet.</li>
-  {% endfor %}
-</ul>
+{% block content %}
+<div class="block">
+    <!-- Back to Profile Button -->
+    <a href="{% url 'core:profile' profile.pk %}">
+        <button class="button is-light">
+            ← Back to Profile
+        </button>
+    </a>
+</div>
+
+<div class="block">
+    <h2 class="title is-3">
+        My Book List
+        <a href="{% url 'core:add_userbook' %}">
+            <button class="button is-dark is-outlined">Add</button>
+        </a>
+    </h2>
+    <ul>
+        {% for item in user_books %}
+            <li>{{ item.book.title }} by {{ item.book.author }} — {{ item.get_status_display }}</li>
+            <a href="{% url 'core:edit_userbook' item.pk %}">Edit</a> |
+            <a href="{% url 'core:delete_userbook' item.pk %}">Delete</a>
+        {% empty %}
+            <li>You haven’t added any books yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

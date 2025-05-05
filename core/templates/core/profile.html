@@ -43,23 +43,20 @@
     <!-- Right column: User book list -->
     <div class="column">
         <div class="block">
-            <h1 class="title is-1">{{ profile.user.username|upper }}'s Books</h1>
+            <h1 class="title is-1">
+                <a href="{% url 'core:my_books' %}">
+                    {{ profile.user.username|upper }}'s Books
+                </a>
+            </h1>
         </div>
 
         <div class="block">
-            <h2 class="title is-3">My Book List <a href="{% url 'core:add_userbook' %}">
-                <button class="button is-dark is-outlined ">
-                    Add
-                </button>
-            </a></h2>
+            <h2 class="title is-3">My Book Stats </h2>
             <ul>
-                {% for item in user_books %}
-                    <li>{{ item.book.title }} by {{ item.book.author }} — {{ item.get_status_display }}</li>
-                    <a href="{% url 'core:edit_userbook' item.pk %}">Edit</a> |
-                    <a href="{% url 'core:delete_userbook' item.pk %}">Delete</a>
-                {% empty %}
-                    <li>You haven’t added any books yet.</li>
-                {% endfor %}
+                <li><strong><a href="{% url 'core:my_books' %}">Books:</a></strong> {{ num_books }}</li>
+                <li><strong><a href="{% url 'core:filtered_books' 'to_read' %}">Books to read:</a></strong> {{ num_to_read }}</li>
+                <li><strong><a href="{% url 'core:filtered_books' 'reading' %}">Books reading currently:</a></strong> {{ num_reading }}</li>
+                <li><strong><a href="{% url 'core:filtered_books' 'finished' %}">Books finished reading:</a></strong> {{ num_finished }}</li>
             </ul>
         </div>
     </div>

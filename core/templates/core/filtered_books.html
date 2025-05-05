@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="block">
+    <a href="{% url 'core:profile' profile.pk %}">
+        <button class="button is-light">← Back to Profile</button>
+    </a>
+</div>
+
+<div class="block">
+    <h2 class="title is-3">
+        Books with status: {{ status|title }}
+    </h2>
+    <ul>
+        {% for item in user_books %}
+            <li>{{ item.book.title }} by {{ item.book.author }}</li>
+        {% empty %}
+            <li>No books with status "{{ status }}"</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
