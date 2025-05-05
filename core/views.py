@@ -4,7 +4,7 @@ from .models import Book, UserBook, Profile
 
 
 def dashboard(request):
-    return render(request, "base.html")
+    return render(request, "core/dashboard.html")
 
 
 def profile_list(request):

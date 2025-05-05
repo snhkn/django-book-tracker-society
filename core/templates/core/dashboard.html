@@ -1,10 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+<div class="block">
+    <a href="{% url 'core:profile_list' %}">
+        <button class="button is-dark is-outlined">All Profiles</button>
+    </a>
+</div>
+
+<div class="column">
+    {% for followed in user.profile.follows.all %}
+        {% for feed in followed.user.feeds.all %}
+            <div class="box">
+                {{ feed.get_action_display }} <strong>{{ feed.book.title }}</strong>
+                <span class="is-small has-text-grey-light">
+                    ({{ feed.timestamp|date:"M d, H:i" }} by
+                    <a href="{% url 'core:profile' followed.id %}">{{ followed.user.username }}</a>)
+                </span>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% for followed in user.profile.follows.all %}
+        {% for note in followed.user.notes.all %}
+            <div class="box">
+                {{ note.content }}
+                <span class="is-small has-text-grey-light">
+                    ({{ note.timestamp|date:"M d, H:i" }} by
+                    <a href="{% url 'core:profile' followed.id %}">{{ followed.user.username }}</a>)
+                </span>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+{% endblock content %}

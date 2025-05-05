@@ -76,6 +76,29 @@
                 <li><strong><a href="{% url 'core:filtered_books' 'finished' %}">Books finished reading:</a></strong> {{ num_finished }}</li>
             </ul>
         </div>
+
+        <div class="content">
+        {% for note in profile.user.notes.all %}
+            <div class="box">
+                {{ note.content }}
+                <span class="is-small has-text-grey-light">
+                    ({{ note.timestamp }})
+                </span>
+            </div>
+        {% endfor %}
+        </div>
+
+        <div class="content">
+        {% for feed in profile.user.feeds.all %}
+            <div class="box">
+                {{ feed.action }} {{feed.book}}
+                <span class="is-small has-text-grey-light">
+                    ({{ feed.timestamp }})
+                </span>
+            </div>
+        {% endfor %}
+        </div>
+
     </div>
 </div>
 

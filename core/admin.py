@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
-from .models import Profile, UserBook, Book
+from .models import Profile, UserBook, Book, Feed, Note
 
 
 class UserBookInline(admin.TabularInline):
@@ -27,3 +27,5 @@ admin.site.register(User, UserAdmin)
 admin.site.unregister(Group)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(Book)
+admin.site.register(Feed)
+admin.site.register(Note)
