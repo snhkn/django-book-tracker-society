@@ -13,11 +13,27 @@ def profile_list(request):
 
 
 def profile(request, pk):
+    if not hasattr(request.user, 'profile'):
+        missing_profile = Profile(user=request.user)
+        missing_profile.save()
+
     profile = Profile.objects.get(pk=pk)
+
+    if request.method == "POST":
+        current_user_profile = request.user.profile
+        data = request.POST
+        action = data.get("follow")
+        if action == "follow":
+            current_user_profile.follows.add(profile)
+        elif action == "unfollow":
+            current_user_profile.follows.remove(profile)
+        current_user_profile.save()
+
     num_books = UserBook.objects.filter(user=profile).count()
     num_to_read = UserBook.objects.filter(user=profile, status="to_read").count()
     num_reading = UserBook.objects.filter(user=profile, status="reading").count()
     num_finished = UserBook.objects.filter(user=profile, status="finished").count()
+
     return render(request, "core/profile.html", {"profile": profile,
                                                  "num_books": num_books,
                                                  "num_to_read": num_to_read,
