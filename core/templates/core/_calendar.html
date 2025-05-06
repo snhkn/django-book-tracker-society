@@ -1,0 +1,17 @@
+<div class="block">
+    <h2 class="title is-4">Activity Calendar ({{ month_days.0|date:"F Y" }})</h2>
+    <div class="columns is-multiline is-mobile is-variable is-1">
+        {% for day in month_days %}
+            <div class="column is-one-seventh has-text-centered">
+                <div class="box {% if day in activity_days %}has-background-success-light{% endif %}">
+                    <strong>{{ day.day }}</strong><br>
+                    {% if day in activity_days %}
+                        <span class="icon has-text-success">✔</span>
+                    {% else %}
+                        <span class="icon has-text-grey-light">•</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

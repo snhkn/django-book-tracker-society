@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UserBookForm, EditUserBookForm, NoteForm
 from .models import Book, UserBook, Profile
-
+from django.utils.timezone import localtime
+from calendar import monthrange
+from collections import defaultdict
+from datetime import date
 
 def dashboard(request):
     form = NoteForm(request.POST or None)
@@ -41,11 +44,28 @@ def profile(request, pk):
     num_reading = UserBook.objects.filter(user=profile, status="reading").count()
     num_finished = UserBook.objects.filter(user=profile, status="finished").count()
 
+    WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    today = date.today()
+    _, days_in_month = monthrange(today.year, today.month)
+
+    # Gather note + feed timestamps
+    note_dates = profile.user.notes.values_list('timestamp', flat=True)
+
+    # Normalize to date (remove time)
+    activity_days = set(
+        localtime(nd).date() for nd in note_dates
+    )
+
     return render(request, "core/profile.html", {"profile": profile,
                                                  "num_books": num_books,
                                                  "num_to_read": num_to_read,
                                                  "num_reading": num_reading,
                                                  "num_finished": num_finished,
+                                                 "weekdays": WEEKDAYS,
+                                                 "month_days": [date(today.year, today.month, day) for day in
+                                                                range(1, days_in_month + 1)],
+                                                 "activity_days": activity_days,
                                                  })
 
 def add_userbook(request):
