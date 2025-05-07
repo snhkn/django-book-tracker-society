@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name ="core"
@@ -12,5 +12,6 @@ urlpatterns = [
     path("books/<str:status>/", views.filtered_books, name="filtered_books"),
     path('edit-userbook/<int:pk>/', views.edit_userbook, name='edit_userbook'),
     path('delete-userbook/<int:pk>/', views.delete_userbook, name='delete_userbook'),
+    path('sign_up/', views.sign_up, name='sign_up'),
 
 ]

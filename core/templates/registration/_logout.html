@@ -1,0 +1,13 @@
+<!-- registration/_logout.html -->
+<form method="post" action="{% url 'logout' %}?next={% url 'login' %}" class="mt-5">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{% url 'core:dashboard' %}" />
+    <div class="field">
+        <div class="control">
+            <button type="submit" class="button is-danger is-fullwidth">
+                <span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+</form>

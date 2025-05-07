@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import UserBookForm, EditUserBookForm, NoteForm
 from .models import Book, UserBook, Profile
+from django.contrib.auth.models import User
 from django.utils.timezone import localtime
 from calendar import monthrange
-from collections import defaultdict
 from datetime import date
-
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+@login_required
 def dashboard(request):
     form = NoteForm(request.POST or None)
     if request.method == "POST":
@@ -16,12 +20,12 @@ def dashboard(request):
             return redirect("core:dashboard")
     return render(request, "core/dashboard.html", {"form": form})
 
-
+@login_required
 def profile_list(request):
     profiles = Profile.objects.exclude(user=request.user)
     return render(request, "core/profile_list.html", {"profiles": profiles})
 
-
+@login_required
 def profile(request, pk):
     if not hasattr(request.user, 'profile'):
         missing_profile = Profile(user=request.user)
@@ -67,7 +71,7 @@ def profile(request, pk):
                                                                 range(1, days_in_month + 1)],
                                                  "activity_days": activity_days,
                                                  })
-
+@login_required
 def add_userbook(request):
     profile = request.user.profile
 
@@ -95,7 +99,7 @@ def add_userbook(request):
 
     return render(request, 'core/add_userbook.html', {'form': form})
 
-
+@login_required
 def my_books(request):
     profile = request.user.profile
     user_books = UserBook.objects.filter(user=profile)
@@ -103,7 +107,7 @@ def my_books(request):
         'profile': profile,
         'user_books': user_books
     })
-
+@login_required
 def edit_userbook(request, pk):
     userbook = UserBook.objects.get(pk=pk)
 
@@ -118,7 +122,7 @@ def edit_userbook(request, pk):
     return render(request, 'core/edit_userbook.html', {'form': form})
 
 
-
+@login_required
 def delete_userbook(request, pk):
     userbook = get_object_or_404(UserBook, pk=pk, user=request.user.profile)
 
@@ -128,7 +132,7 @@ def delete_userbook(request, pk):
 
     return render(request, 'core/delete_userbook.html', {'userbook': userbook})
 
-
+@login_required
 def filtered_books(request, status):
     profile = request.user.profile
     user_books = UserBook.objects.filter(user=profile, status=status)
@@ -138,3 +142,25 @@ def filtered_books(request, status):
         "user_books": user_books,
         "profile": profile,
     })
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password1', 'password2']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.help_text = None  # Removes help text
+
+
+def sign_up(request):
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect(reverse("core:dashboard"))
+    else:
+        form = CustomUserCreationForm()
+    return render(request, "registration/sign_up.html", {"form": form})

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="columns is-centered">
+    <div class="column is-half">
+        <h2 class="title is-4 has-text-centered">Login</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field">
+                    <label class="label">{{ field.label }}</label>
+                    <div class="control">
+                        {{ field }}
+                    </div>
+                    {% if field.errors %}
+                        <p class="help is-danger">{{ field.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <input type="hidden" name="next" value="{% url 'core:dashboard' %}" />
+
+            <button class="button is-success is-fullwidth is-medium mt-4">Login</button>
+        </form>
+
+        <div class="has-text-centered mt-2">
+            <p>Don't have an account? <a href="{% url 'core:sign_up' %}">Sign up here</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock content %}

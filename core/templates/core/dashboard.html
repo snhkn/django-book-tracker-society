@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <div class="column is-one-third">
     <div class="block">
         <a href="{% url 'core:profile_list' %}">
@@ -9,9 +10,13 @@
     </div>
 
     <div class="block">
-        <a href="{% url 'core:profile' request.user.profile.id %}">
+        {% if request.user.profile and request.user.profile.id %}
+            <a href="{% url 'core:profile' request.user.profile.id %}">
             <button class="button is-success is-light is-outlined is-fullwidth">My Profile</button>
-        </a>
+            </a>
+        {% else %}
+            <p class="has-text-grey-light">Profile not available</p>
+        {% endif %}
     </div>
 </div>
 
@@ -49,5 +54,15 @@
             Note
         </button>
     </form>
+    {% if user.is_authenticated %}
+        {% include "registration/_logout.html" %}
+        <a href="{% url 'password_change' %}">Change password</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'core:sign_up' %}">Sign up</a>
+    {% endif %}
 </div>
+
+
+
 {% endblock content %}
