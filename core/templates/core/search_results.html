@@ -1,0 +1,11 @@
+<h2 class="title is-4">Search results for "{{ query }}"</h2>
+
+{% if results %}
+  {% for userbook in results %}
+    <div class="box">
+      <strong>{{ userbook.book.title }}</strong> by {{ userbook.book.author }}
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No books found.</p>
+{% endif %}

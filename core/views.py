@@ -202,3 +202,27 @@ def sign_up(request):
     else:
         form = CustomUserCreationForm()
     return render(request, "registration/sign_up.html", {"form": form})
+
+
+from django.db.models import Q
+
+from django.db.models import Q
+
+@login_required
+def search_books(request):
+    query = request.GET.get("q", "")
+    results = []
+
+    if query:
+        results = UserBook.objects.filter(
+            user=request.user.profile  # use Profile instance
+        ).filter(
+            Q(book__title__icontains=query) | Q(book__author__icontains=query)
+        ).select_related("book")
+
+    return render(request, "core/search_results.html", {
+        "results": results,
+        "query": query,
+    })
+
+

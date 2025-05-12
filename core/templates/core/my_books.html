@@ -39,4 +39,22 @@
         <a href="?page={{ page_obj.next_page_number }}">Next</a>
       {% endif %}
     </div>
+</div>
+
+<div class="block">
+    <form method="get" action="{% url 'core:search_books' %}">
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" type="text" name="q" placeholder="Search your books...">
+            </div>
+            <div class="control">
+              <button class="button is-info" type="submit">Search</button>
+            </div>
+          </div>
+    </form>
+
+</div>
+
+
+
 {% endblock %}
