@@ -21,29 +21,31 @@
 </div>
 
 <div class="column">
-    {% for followed in user.profile.follows.all %}
-        {% for feed in followed.user.feeds.all %}
+    <h2 class="title">Activity</h2>
+    {% for item in page_obj %}
             <div class="box">
-                {{ feed.get_action_display }} <strong>{{ feed.book.title }}</strong>
+                {% if item.type == "feed" %}
+                    {{ item.get_action_display }} <strong>{{ item.book.title }}</strong>
+                {% elif item.type == "note" %}
+                    {{ item.content }}
+                {% endif %}
                 <span class="is-small has-text-grey-light">
-                    ({{ feed.timestamp|date:"M d, H:i" }} by
-                    <a href="{% url 'core:profile' followed.id %}">{{ followed.user.username }}</a>)
+                    ({{ item.timestamp|date:"M d, H:i" }} by
+                    <a href="{% url 'core:profile' item.user.profile.id %}">{{ item.user.username }}</a>)
                 </span>
             </div>
-        {% endfor %}
     {% endfor %}
 
-    {% for followed in user.profile.follows.all %}
-        {% for note in followed.user.notes.all %}
-            <div class="box">
-                {{ note.content }}
-                <span class="is-small has-text-grey-light">
-                    ({{ note.timestamp|date:"M d, H:i" }} by
-                    <a href="{% url 'core:profile' followed.id %}">{{ followed.user.username }}</a>)
-                </span>
-            </div>
-        {% endfor %}
-    {% endfor %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Prev</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </div>
+
 </div>
 
 <div class="column is-one-third">

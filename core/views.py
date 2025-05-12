@@ -9,6 +9,11 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from itertools import chain
+from operator import attrgetter
+from .models import Note, Feed
+
 @login_required
 def dashboard(request):
     form = NoteForm(request.POST or None)
@@ -18,12 +23,39 @@ def dashboard(request):
             note.user = request.user
             note.save()
             return redirect("core:dashboard")
-    return render(request, "core/dashboard.html", {"form": form})
+
+    # Get all followed profiles
+    followed_profiles = request.user.profile.follows.all()
+
+    # Get feeds and notes only from followed users
+    feeds = Feed.objects.filter(user__profile__in=followed_profiles)
+    notes = Note.objects.filter(user__profile__in=followed_profiles)
+
+    # Add a type to distinguish in template
+    for f in feeds:
+        f.type = "feed"
+    for n in notes:
+        n.type = "note"
+
+    combined = sorted(chain(feeds, notes), key=attrgetter("timestamp"), reverse=True)
+
+    # Paginate combined results
+    paginator = Paginator(combined, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "core/dashboard.html", {
+        "form": form,
+        "page_obj": page_obj,
+    })
 
 @login_required
 def profile_list(request):
     profiles = Profile.objects.exclude(user=request.user)
-    return render(request, "core/profile_list.html", {"profiles": profiles})
+    paginator = Paginator(profiles, 10)  # Show 10 profiles per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    return render(request, "core/profile_list.html", {"profiles": profiles, "page_obj": page_obj})
 
 @login_required
 def profile(request, pk):
@@ -103,9 +135,15 @@ def add_userbook(request):
 def my_books(request):
     profile = request.user.profile
     user_books = UserBook.objects.filter(user=profile)
+
+    paginator = Paginator(user_books, 5)  # Show 5 books per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'core/my_books.html', {
         'profile': profile,
-        'user_books': user_books
+        'user_books': user_books,
+        'page_obj': page_obj
     })
 @login_required
 def edit_userbook(request, pk):
