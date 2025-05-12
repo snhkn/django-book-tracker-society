@@ -25,7 +25,7 @@
     {% for item in page_obj %}
             <div class="box">
                 {% if item.type == "feed" %}
-                    {{ item.get_action_display }} <strong>{{ item.book.title }}</strong>
+                {{ item.get_action_display }} <strong>{{ item.book.title }}</strong>
                 {% elif item.type == "note" %}
                     {{ item.content }}
                 {% endif %}

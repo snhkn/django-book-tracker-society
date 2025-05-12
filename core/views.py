@@ -17,6 +17,7 @@ from .models import Note, Feed
 @login_required
 def dashboard(request):
     form = NoteForm(request.POST or None)
+
     if request.method == "POST":
         if form.is_valid():
             note = form.save(commit=False)
@@ -24,30 +25,33 @@ def dashboard(request):
             note.save()
             return redirect("core:dashboard")
 
-    # Get all followed profiles
-    followed_profiles = request.user.profile.follows.all()
+    user_profile = request.user.profile
+    follows = user_profile.follows.all().order_by("-id")
 
-    # Get feeds and notes only from followed users
-    feeds = Feed.objects.filter(user__profile__in=followed_profiles)
-    notes = Note.objects.filter(user__profile__in=followed_profiles)
 
-    # Add a type to distinguish in template
-    for f in feeds:
-        f.type = "feed"
-    for n in notes:
-        n.type = "note"
+    activities = []
 
-    combined = sorted(chain(feeds, notes), key=attrgetter("timestamp"), reverse=True)
+    for profile in follows:
+        for feed in profile.user.feeds.all():
+            feed.type = "feed"
+            feed.user = profile.user  # manually attach for template
+            activities.append(feed)
+        for note in profile.user.notes.all():
+            note.type = "note"
+            note.user = profile.user
+            activities.append(note)
 
-    # Paginate combined results
-    paginator = Paginator(combined, 10)
+    activities.sort(key=lambda x: x.timestamp, reverse=True)
+
+    paginator = Paginator(activities, 5)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     return render(request, "core/dashboard.html", {
         "form": form,
-        "page_obj": page_obj,
+        "page_obj": page_obj
     })
+
 
 @login_required
 def profile_list(request):
@@ -123,6 +127,10 @@ def add_userbook(request):
             # Prevent duplicate UserBook
             if not UserBook.objects.filter(user=profile, book=book).exists():
                 UserBook.objects.create(user=profile, book=book, status=status)
+
+                # ✅ Create Feed object
+                Feed.objects.create(user=request.user, book=book, action='added')
+
                 return redirect('core:my_books')  # redirect after success
             else:
                 form.add_error(None, "You already added this book.")
@@ -145,20 +153,32 @@ def my_books(request):
         'user_books': user_books,
         'page_obj': page_obj
     })
+
 @login_required
 def edit_userbook(request, pk):
+
     userbook = UserBook.objects.get(pk=pk)
 
     if request.method == 'POST':
         form = EditUserBookForm(request.POST, instance=userbook)
         if form.is_valid():
-            form.save()
+            old_status = userbook.status  # before saving
+            updated_userbook = form.save(commit=False)
+
+            if old_status != updated_userbook.status:
+                # Customize action based on new status
+                Feed.objects.create(
+                    user=request.user,
+                    book=updated_userbook.book,
+                    action=f'updated status to {updated_userbook.status}'
+                )
+
+            updated_userbook.save()
             return redirect('core:profile', pk=request.user.profile.id)
     else:
         form = EditUserBookForm(instance=userbook)
 
     return render(request, 'core/edit_userbook.html', {'form': form})
-
 
 @login_required
 def delete_userbook(request, pk):
